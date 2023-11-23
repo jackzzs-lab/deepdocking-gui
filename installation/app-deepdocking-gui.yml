@@ -1,4 +1,4 @@
-name: DeepDockingLocal
+name: app-deepdocking-gui
 channels:
   - conda-forge
   - bioconda

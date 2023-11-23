@@ -70,7 +70,7 @@ bash prepare_receptor.py receptor.pdb 'x_size,y_size,z_size' 'x_center,y_center,
 - path_adt_scripts: path to folder with AutodockTools python scripts (prepare_receptor4.py, etc etc..)
 
 ## 1. Starting up the GUI
-After installation, a new Conda environment on your local device called *DeepDockingLocal* should now be available. To start up the GUI, activate the *DeepDockingLocal* environment then navigate to `Deep-Docking/GUI` and run the appropriate command to start up the server.
+After installation, a new Conda environment on your local device called *app-deepdocking-gui* should now be available. To start up the GUI, activate the *app-deepdocking-gui* environment then navigate to `Deep-Docking/GUI` and run the appropriate command to start up the server.
 
 For mac and linux:
 ```bash 
@@ -84,7 +84,7 @@ npm run start-win
 After running the above, you should see something similar to the following: 
 ```bash 
 > dd_gui@2.0.0 start-win
-> conda activate DeepDockingLocal && set FLASK_APP=server.py && set FLASK_ENV=local_host && flask run
+> conda activate app-deepdocking-gui && set FLASK_APP=server.py && set FLASK_ENV=local_host && flask run
 
  * Serving Flask app "server.py "
  * Environment: local_host 
@@ -178,7 +178,7 @@ From the top scoring tab (figure 7) we can download a list of the top 1000 molec
     model_config = json.loads(model_config.decode('utf-8'))
 AttributeError: 'str' Object has no attribute 'decode'
 ```
-  >This error is followed by an `IndexError` on line 264 of `get_model_image` and is most likely a dependancy issue with keras, make sure you have version 2.10.0 of `h5py` (versions 3.0+ cause issues) installed on the cluster side in the `DeepDockingRemote` conda environment. You can check the version by first activating the conda environment and then typing `pip show h5py`.<br>
+  >This error is followed by an `IndexError` on line 264 of `get_model_image` and is most likely a dependancy issue with keras, make sure you have version 2.10.0 of `h5py` (versions 3.0+ cause issues) installed on the cluster side in the `app-deepdocking-gui-remote` conda environment. You can check the version by first activating the conda environment and then typing `pip show h5py`.<br>
   >You can install/downgrade it using pip: `pip install h5py==2.10.0` 
 
 

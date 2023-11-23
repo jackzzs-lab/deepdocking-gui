@@ -8,10 +8,11 @@ def check_backend():
     json_str = open('src/backend/db.json').read()  # TODO: Sibling files not recognizing each other when called from another file path.
     db_dict = json.loads(json_str)
     ip = db_dict['ip']
+    port = db_dict.get['port']
 
     user = input("cluster username: ")
     password = input("cluster password: ")
-    ssh_connection = SSH(host=ip)
+    ssh_connection = SSH(host=ip, port=port)
     ssh_connection.connect(username=user, password=password)
     backend = Backend(ssh=ssh_connection)
     return backend

@@ -29,16 +29,16 @@ BACKEND = None
 MODE_SCAFFOLD = None
 PROJECTS_PATH = './src/backend/projects/'
 
-# Launching the app automatically if prompted
-if not app.debug:
-    # Ask user if they want to open the DD website automatically
-    prompt = "\nOpen Website On Default Browser? \nEnter y to launch or any other key to open manually: "
-    open_site = True if input(prompt).rstrip() == "y" else False
-    if open_site:
-        import webbrowser
-        webbrowser.open("http://127.0.0.1:5000/")
-    else:
-        print("Enter the provided link into your browser.")
+# # Launching the app automatically if prompted
+# if not app.debug:
+#     # Ask user if they want to open the DD website automatically
+#     prompt = "\nOpen Website On Default Browser? \nEnter y to launch or any other key to open manually: "
+#     open_site = True if input(prompt).rstrip() == "y" else False
+#     if open_site:
+#         import webbrowser
+#         webbrowser.open("http://127.0.0.1:5000/")
+#     else:
+#         print("Enter the provided link into your browser.")
 
 def serve_pil_image(pil_img):
     img_io = BytesIO()

@@ -7,7 +7,7 @@ class SSH:
 
     """ This class will automatically ssh into the host cluster. """
 
-    def __init__(self, host=None):
+    def __init__(self, host=None, port=None):
         if host is None:
             try:
                 json_str = open('src/backend/db.json').read() # TODO: Sibling files not recognizing each other when called from another file path.
@@ -16,9 +16,19 @@ class SSH:
             except FileNotFoundError as e:
                 print(e.__traceback__, "'db.json' not found! Please run the installation first before running GUI.")
                 raise e
+            
+        if port is None:
+            try:
+                json_str = open('src/backend/db.json').read() # TODO: Sibling files not recognizing each other when called from another file path.
+                db_dict = json.loads(json_str)
+                port = db_dict['port']
+            except FileNotFoundError as e:
+                print(e.__traceback__, "'db.json' not found! Please run the installation first before running GUI.")
+                raise e
         
         # The information that will allow for ssh
         self.host = host
+        self.port = port
         self.user = ""
         self.pwrd = ""
         self.ssh = None
@@ -40,7 +50,7 @@ class SSH:
         # Connect to ssh and set out ssh object
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(self.host, username=self.user, password=self.pwrd)
+        ssh.connect(self.host, port=self.port, username=self.user, password=self.pwrd)
         self.ssh = ssh
 
     def download(self, remote_path, local_path):

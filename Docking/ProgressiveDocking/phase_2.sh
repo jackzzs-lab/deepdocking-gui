@@ -32,7 +32,7 @@ python $script_path/jobid_writer.py -file_path $project_path -n_it $iteration -j
 # For some reason, running this with the conda environment activated causes an error.
 # We must deactivate it before running!
 source ~/.bashrc
-source $local_path/deactivation_script.sh
+source $script_path/deactivation_script.sh
 
 # Move into the project
 cd $project_path/iteration_$iteration

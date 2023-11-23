@@ -19,11 +19,11 @@ def install_dependencies(simulate):
     print("Welcome to the DeepDocking Installer\n")
 
     print("Before installing Deep Docking, we require you to have the required dependencies to run the GUI.")
-    print("To do this, we will automatically create a new conda environment for you called DeepDockingLocal")
+    print("To do this, we will automatically create a new conda environment for you called app-deepdocking-gui")
     if input("'y' to create or enter any other key to exit ") == 'y':
         # TODO Check the os and change this accordingly
         if not simulate:
-            os.system("conda env create -f {}".format("DeepDockingLocal.yml"))
+            os.system("bash -c 'conda env create -f {}'".format("app-deepdocking-gui.yml"))
     else:
         exit()
 
@@ -42,30 +42,34 @@ def install_deep_docking(simulate):
     print("To begin installing, we require you to log into your cluster")
 
     def login():
-        login_info = input("Cluster username and IP (ex: johnsmith@111.209.108.241): ")
+        login_info = input("Cluster username and IP (ex: johnsmith@111.209.108.241:22): ").strip(" ")
         while '@' not in login_info:
             print("Please re-enter a valid login:")
             login_info = input("Cluster username and IP (ex: johnsmith@111.209.108.241): ").strip(" ")
         password = getpass("Cluster password: ")
-        ip = login_info.split("@")[1]
+        ip = login_info.split("@")[1].split(":")[0]
         user = login_info.split("@")[0]
-        ssh = InstallationAssistant(host=ip)
+        try:
+            port = int(login_info.split(":")[1])
+        except IndexError:
+            port = 22
+        ssh = InstallationAssistant(host=ip, port=port)
         if not simulate:
             try:
                 ssh.connect(user, password)
                 print("\nLogging you in... Welcome, {}.".format(user))
-                return True, ssh, ip
+                return True, ssh, ip, port
             except ssh.connection_exception:
                 print("Login failed... please try again")
-                return False, ssh, ip
+                return False, ssh, ip, port
         else:
             print("\nLogging you in... Welcome, {}.".format(user))
-            return True, ssh, ip
+            return True, ssh, ip, port
 
     # Create a loop to log the user in despite making mistakes
-    logged_in, connection, ip = login()
+    logged_in, connection, ip, port = login()
     while not logged_in:
-        logged_in, connection, ip = login()
+        logged_in, connection, ip, port = login()
 
     print("Where would you like deep docking to be installed?")
     installation_path = input("Installation path: ").strip(" ")
@@ -77,7 +81,7 @@ def install_deep_docking(simulate):
         # Create the venv on the cluster and save the activation command
         if not simulate:
             connection.create_venv()
-        env_activation = "conda activate DeepDockingRemote"
+        env_activation = "conda activate app-deepdocking-gui-remote"
         env_deactivation = "conda deactivate"
     else:
         # If we did not create a new conda env, we will
@@ -103,22 +107,23 @@ def install_deep_docking(simulate):
     installation_information = {'remote_path': docking_path,
                                 'local_dir': local_dir,
                                 'ip': ip,
+                                'port': port,
                                 'docking_path': docking_path,
                                 'remote_gui_path': remote_gui_path,
                                 'env_activation_command': env_activation,
                                 'path_to_autodock': path_to_autodock}
 
     # This is the information the backend of the gui will use
-    local_activation_command = 'conda activate DeepDockingLocal'
+    local_activation_command = 'conda activate app-deepdocking-gui'
     if platform == "linux" or platform == "linux2":
         # linux
-        local_activation_command = 'conda activate DeepDockingLocal'
+        local_activation_command = 'conda activate app-deepdocking-gui'
     elif platform == "darwin":
         # OS X
-        local_activation_command = 'conda activate DeepDockingLocal'
+        local_activation_command = 'conda activate app-deepdocking-gui'
     elif platform == "win32":
         # Windows...
-        local_activation_command = 'conda activate DeepDockingLocal'
+        local_activation_command = 'conda activate app-deepdocking-gui'
 
     installation_information['project_path'] = docking_path.replace("/DeepDocking/", "/DeepDockingProjects/")
     installation_information['env_deactivation_command'] = env_deactivation
@@ -157,10 +162,11 @@ def print_txt_message(text_file):
 class InstallationAssistant:
     """ This class will automatically ssh into the host cluster. """
 
-    def __init__(self, host):
+    def __init__(self, host, port):
 
         # The information that will allow for ssh
         self.host = host
+        self.port = port
         self.user = ""
         self.pwrd = ""
         self.ssh = None
@@ -185,7 +191,7 @@ class InstallationAssistant:
         # Connect to ssh and set out ssh object
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(self.host, username=self.user, password=self.pwrd)
+        ssh.connect(self.host, username=self.user, password=self.pwrd, port=self.port)
         self.ssh = ssh
 
     def check_path(self, path):
@@ -197,7 +203,7 @@ class InstallationAssistant:
         # TODO Create a bash script to install conda if the user does not have it yet
 
         # Build the commands to create the env
-        creation_command = "conda create -n DeepDockingRemote -y python=3.6.8"
+        creation_command = "conda create -n app-deepdocking-gui-remote -y python=3.6.8"
         specify = True if input("Specify library versions? (y/n) ") == 'y' else False
         install_tf = "pip install tensorflow-gpu"
         install_np = "pip install numpy"
@@ -261,70 +267,70 @@ class InstallationAssistant:
         progress_bar()
 
         # install tf
-        out = self.command("conda activate DeepDockingRemote; " + install_tf)
+        out = self.command("conda activate app-deepdocking-gui-remote; " + install_tf)
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install pybel
-        # out = self.command("conda activate DeepDockingRemote; conda install -c openbabel openbabel")
+        # out = self.command("conda activate app-deepdocking-gui-remote; conda install -c openbabel openbabel")
         lines += []
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install numpy
-        out = self.command("conda activate DeepDockingRemote; " + install_np)
+        out = self.command("conda activate app-deepdocking-gui-remote; " + install_np)
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install pydot
-        out = self.command("conda activate DeepDockingRemote; pip install pydot")
+        out = self.command("conda activate app-deepdocking-gui-remote; pip install pydot")
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install openbabel
-        out = self.command("conda activate DeepDockingRemote; conda install -c conda-forge openbabel")
+        out = self.command("conda activate app-deepdocking-gui-remote; conda install -c conda-forge openbabel")
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install pandas
-        out = self.command("conda activate DeepDockingRemote; " + install_pd)
+        out = self.command("conda activate app-deepdocking-gui-remote; " + install_pd)
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install rdkit
-        out = self.command("conda activate DeepDockingRemote; conda install -c conda-forge rdkit")
+        out = self.command("conda activate app-deepdocking-gui-remote; conda install -c conda-forge rdkit")
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install sklearn
-        out = self.command("conda activate DeepDockingRemote; " + install_skl)
+        out = self.command("conda activate app-deepdocking-gui-remote; " + install_skl)
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install IPython
-        out = self.command("conda activate DeepDockingRemote; pip install IPython")
+        out = self.command("conda activate app-deepdocking-gui-remote; pip install IPython")
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
         progress_bar()
 
         # install cuda tool kit
-        out = self.command("conda activate DeepDockingRemote; conda install -c anaconda cudatoolkit={}".format(cuda_version))
+        out = self.command("conda activate app-deepdocking-gui-remote; conda install -c anaconda cudatoolkit={}".format(cuda_version))
         lines += out.readlines()
         write_to_out(lines)
         progress_bar.current += 1
@@ -354,7 +360,8 @@ class InstallationAssistant:
             ftp_client.mkdir(remote + "/GUI")
             ftp_client.mkdir(remote + "/GUI/images")
             ftp_client.mkdir(remote + "/GUI/images/models")
-        except OSError:
+        except OSError as e:
+            print(e.__class__, e)
             print("The directory DeepDocking already exists at", remote)
             if input("Overwrite? If no, exit installation: y/n ").lower() in {'yes', 'y'}:
                 # remove the dir (recursively) and make a new one

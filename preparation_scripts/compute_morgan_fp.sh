@@ -1,5 +1,4 @@
 #!/bin/bash
-#SBATCH --partition=normal
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH --job-name=calculate_morgan_fing

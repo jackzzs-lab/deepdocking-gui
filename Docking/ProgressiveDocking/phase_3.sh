@@ -42,7 +42,7 @@ python jobid_writer.py -file_path $project_path -n_it $iteration -jid $SLURM_JOB
 cd $project_path/iteration_$iteration
 echo Running Phase 3
 mkdir res
-for i in $(ls -d chunks_smi/*); do fld=$(echo $i | rev | cut -d'/' -f 1 | rev); mkdir res/$fld; cd res/$fld; sbatch $slurm_args_g $scripts/autodock_gpu_ad.sh 64 sw $PATH_FLD ../../$i'/'$fld'_'pdbqt list.txt $num_energy_evaluations $num_runs $path_to_auto_dock_gpu $scripts; cd ../../;done
+for i in $(ls -d chunks_smi/*); do fld=$(echo $i | rev | cut -d'/' -f 1 | rev); mkdir res/$fld; cd res/$fld; sbatch $slurm_args_g $scripts/autodock_gpu_ad.sh 128 sw $PATH_FLD ../../$i'/'$fld'_'pdbqt list.txt $num_energy_evaluations $num_runs $path_to_auto_dock_gpu $scripts; cd ../../;done
 
 cd $scripts
 python phase_changer.py -pf phase_3.sh -itr $project_path/iteration_$iteration

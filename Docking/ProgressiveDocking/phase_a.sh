@@ -46,6 +46,10 @@ echo - Chunk Size: $chunk_size
 echo - Percent First Mol: $percent_fist_mol
 echo - Percent Last Mol: $percent_last_mol
 
+# This should activate the conda environment
+source ~/.bashrc
+source $local_path/activation_script.sh
+
 # Grab everything from the logs file
 file_path=$(sed -n '1p' $2/$3/logs.txt)
 protein=$(sed -n '2p' $2/$3/logs.txt)
