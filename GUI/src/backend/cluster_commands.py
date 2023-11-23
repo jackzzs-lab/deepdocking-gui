@@ -147,7 +147,7 @@ def run_all_phases(project_name, specifications, logs):
 
     # Clamp the current phase before submitting job
     current_phase = current_phase if current_phase > 0 else 1
-    command = f"sbatch `sed -n 2p ./slurm_args/{project_name}_slurm_args.txt` {local_path}/phase_a.sh " \
+    command = f"sbatch `sed -n 1p ./slurm_args/{project_name}_slurm_args.txt` {local_path}/phase_a.sh " \
               f"{t_cpu} {project_path} {project_name} {top_n} {current_it} {current_phase} " \
               f"{mols_to_dock} {final_iteration} {local_path} {path_to_auto_dock} " \
               f"{path_to_fld_file} {num_energy_evaluations} {num_runs} {chunk_size} " \
