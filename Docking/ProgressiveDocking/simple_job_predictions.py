@@ -33,8 +33,6 @@ except OSError:
 for f in glob.glob(SAVE_PATH + '/iteration_' + str(n_it) + '/simple_job_predictions/*'):
     os.remove(f)
 
-time = '0-10:30'
-
 # temp = []
 part_files = []
 
@@ -51,7 +49,6 @@ for f in part_files:
         ref.write('#SBATCH --cpus-per-task=1\n')
         ref.write('#SBATCH --job-name=phase_5\n')
         ref.write('#SBATCH --mem=0               # memory per node\n')
-        ref.write('#SBATCH --time=' + time + '            # time (DD-HH:MM)\n')
         ref.write("#SBATCH --output=slurm-phase_5-%x.%j.out\n")
         ref.write("#SBATCH --error=slurm-phase_5-%x.%j.err\n")
         ref.write('\n')

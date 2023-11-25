@@ -1,6 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=prepare
-#SBATCH --time=04:00:00
 #SBATCH --output=slurm-phase_2-%x.%j.out
 #SBATCH --error=slurm-phase_2-%x.%j.err
 
@@ -31,7 +30,7 @@ cp $name'.'sdf $fld'/'
 cd $fld
 python $script_path'/'split_sdf.py $name'.'sdf
 rm $name'.'sdf
-obabel -isdf *sdf -opdbqt -m
+find . -type f -name '*.sdf' | xargs -d '\n' -n 10000 -P 24 bash -c 'obabel -isdf "$@" -opdbqt -m;' command
 wait $!
 rm *sdf
 
