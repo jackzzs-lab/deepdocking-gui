@@ -32,7 +32,7 @@ python $script_path'/'split_sdf.py $name'.'sdf
 rm $name'.'sdf
 find . -type f -name '*.sdf' | xargs -d '\n' -n 10000 -P 24 bash -c 'obabel -isdf "$@" -opdbqt -m;' command
 wait $!
-rm *sdf
+perl -e 'for(<*.sdf>){((stat)[9]<(unlink))}'
 
 end=`date +%s`
 echo $((end-start))
