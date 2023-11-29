@@ -30,7 +30,7 @@ def save_slurm_arg(project_name, path, n_cpu, cpu_partition, gpu_partition, cust
         slurm_args_gpart += " --partition=" + gpu_partition if gpu_partition is not None and "partition" not in slurm_args else ""
         f.write(slurm_args_gpart + "\n") # 3: write without cpu arg for gpu req scripts 
 
-        slurm_args_gpart += " --cpus-per-task="+str(n_cpu) if n_cpu is not None and "cpus-per-task" not in slurm_args else ""
+        slurm_args_gpart += " --cpus-per-task=3" if "cpus-per-task" not in slurm_args else ""
         f.write(slurm_args_gpart + "\n") # 4: write with cpu arg for gpu req scripts 
 
 
