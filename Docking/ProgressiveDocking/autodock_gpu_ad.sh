@@ -48,18 +48,18 @@ rm -r $out_fold
 mkdir $out_fold
 mkdir $out_fold/pdbqt
 
-find . -name "$dlg_fold/*dlg" -print0 | 
-    while IFS= read -r -d '' line; do 
-        name=$(grep -m 1 'Name' $i|awk '{print $5}')
-        if [ "$mode" == "be" ]; then
-        run=$(grep -m 1 'RANKING' $i|awk '{print $3}')
-        score=$(grep -m 1 'RANKING' $i|awk '{print $4}')
-        elif [ "$mode" == "lc" ]; then
-        score=$(grep '#' $i|awk '$9>a {a=$9; b=$3} END {print b}')
-        run=$(grep '#' $i|awk '$9>a {a=$9; b=$5} END {print b}')
+find "$dlg_fold" -name "*dlg" -print0 |
+    while IFS= read -r -d '' dlg; do
+        name=$(grep -m 1 'Name' $dlg|awk '{print $5}')
+        if [[ "$mode" == "be" ]]; then
+        run=$(grep -m 1 'RANKING' $dlg|awk '{print $3}')
+        score=$(grep -m 1 'RANKING' $dlg|awk '{print $4}')
+        elif [[ "$mode" == "lc" ]]; then
+        score=$(grep '#' $dlg|awk '$9>a {a=$9; b=$3} END {print b}')
+        run=$(grep '#' $dlg|awk '$9>a {a=$9; b=$5} END {print b}')
         fi
         echo "ADSCOR   $score">>$out_fold/pdbqt/$name
-        awk -v p="DOCKED: MODEL        $run" '$0~p{f=1} f{print} f&&/DOCKED: ENDMDL/{exit}' $i|cut -c9-|sed '/USER/d;/REMARK/d;/MODEL/d;/TORSDOF/d'>>$out_fold/pdbqt/$name
+        awk -v p="DOCKED: MODEL        $run" '$0~p{f=1} f{print} f&&/DOCKED: ENDMDL/{exit}' $dlg|cut -c9-|sed '/USER/d;/REMARK/d;/MODEL/d;/TORSDOF/d'>>$out_fold/pdbqt/$name
     done
 
 perl -e "for(<$dlg_fold/*dlg>){((stat)[9]<(unlink))}"
@@ -68,7 +68,7 @@ perl -e "for(<$dlg_fold/*xml>){((stat)[9]<(unlink))}"
 cd $out_fold/pdbqt
 mkdir ../sdf
 find . -type f | xargs -d '\n' -n 10000 bash -c 'obabel -ipdbqt "$@" -osdf -m;' command
-find . -type f | xargs -d '\n' -n 10000 bash -c "cat \"$@\" >> ../sdf/res_$out_file'.'sdf;" command
+find . -name '*.sdf' -type f -exec cat {} + > "../sdf/res_$out_file.sdf"
 cd ..
 perl -e "for(<pdbqt/*>){((stat)[9]<(unlink))}"
 rm -r pdbqt
